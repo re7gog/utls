@@ -930,6 +930,8 @@ type Config struct {
 	//
 	// If GREASE ECH extension is present, this field will be ignored.
 	ECHConfigs []ECHConfig // [uTLS]
+
+	SessionIDGenerator func(clientHello []byte, sessionID []byte) error
 }
 
 // EncryptedClientHelloKey holds a private key that is associated
@@ -1037,6 +1039,7 @@ func (c *Config) Clone() *Config {
 
 		PreferSkipResumptionOnNilExtension: c.PreferSkipResumptionOnNilExtension, // [UTLS]
 		ECHConfigs:                         c.ECHConfigs,                         // [uTLS]
+		SessionIDGenerator:                 c.SessionIDGenerator,
 	}
 }
 
