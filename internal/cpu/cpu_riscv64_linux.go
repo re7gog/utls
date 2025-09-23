@@ -6,7 +6,11 @@
 
 package cpu
 
-import _ "unsafe"
+import (
+	"syscall"
+	"unsafe"
+	_ "unsafe"
+)
 
 // RISC-V extension discovery code for Linux.
 //
@@ -63,7 +67,18 @@ type riscvHWProbePairs struct {
 }
 
 //go:linkname riscvHWProbe
-func riscvHWProbe(pairs []riscvHWProbePairs, flags uint) bool
+func riscvHWProbe(pairs []riscvHWProbePairs, flags uint) bool {
+	// sys_RISCV_HWPROBE is copied from golang.org/x/sys/unix/zsysnum_linux_riscv64.go.
+	const sys_RISCV_HWPROBE uintptr = 258
+
+	if len(pairs) == 0 {
+		return false
+	}
+	// Passing in a cpuCount of 0 and a cpu of nil ensures that only extensions supported by all the
+	// cores are returned, which is the behaviour we want in internal/cpu.
+	_, _, e1 := syscall.Syscall6(sys_RISCV_HWPROBE, uintptr(unsafe.Pointer(&pairs[0])), uintptr(len(pairs)), uintptr(0), uintptr(unsafe.Pointer(nil)), uintptr(flags), 0)
+	return e1 == 0
+}
 
 func osInit() {
 	// A slice of key/value pair structures is passed to the RISCVHWProbe syscall. The key
