@@ -6,6 +6,8 @@
 
 package cpu
 
+import _ "unsafe" // for linkname
+
 const (
 	// getsystemcfg constants
 	_SC_IMPL      = 2
