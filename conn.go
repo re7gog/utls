@@ -1063,6 +1063,27 @@ func (c *Conn) writeHandshakeRecord(msg handshakeMessage, transcript transcriptH
 	c.out.Lock()
 	defer c.out.Unlock()
 
+	// [SHADOWTLS SECTION BEGINS]
+	// A random session ID is used to detect when the server accepted a ticket
+	// and is resuming a session (see RFC 5077). In TLS 1.3, it's always set as
+	// a compatibility measure (see RFC 8446, Section 4.1.2).
+	if c.config.SessionIDGenerator != nil {
+		if hello, ok := msg.(*clientHelloMsg); ok {
+			hello.sessionId = make([]byte, 32)
+			hello.original = nil
+			data, err := hello.marshal()
+			if err != nil {
+				return 0, err
+			}
+			err = c.config.SessionIDGenerator(data, hello.sessionId)
+			if err != nil {
+				return 0, fmt.Errorf("tls: generate session id failed: %w", err)
+			}
+			hello.original = nil
+		}
+	}
+	// [SHADOWTLS SECTION ENDS]
+
 	data, err := msg.marshal()
 	if err != nil {
 		return 0, err
