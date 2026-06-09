@@ -645,6 +645,10 @@ var (
 	HelloChrome_131 = ClientHelloID{helloChrome, "131", nil, nil}
 	// Chrome w/ New ALPS codepoint
 	HelloChrome_133 = ClientHelloID{helloChrome, "133", nil, nil}
+	// Chrome w/ Trust anchors (draft)
+	HelloChrome_141_TA = ClientHelloID{helloChrome, "141", nil, nil}
+	// Chrome w/ TA and PQ MLDSA Signatures (draft and experiment)
+	HelloChrome_144_TA_PQS = ClientHelloID{helloChrome, "144", nil, nil}
 
 	HelloIOS_Auto = HelloIOS_14
 	HelloIOS_11_1 = ClientHelloID{helloIOS, "111", nil, nil} // legacy "111" means 11.1
@@ -688,6 +692,8 @@ type Weights struct {
 	FirstKeyShare_Set_CurveP256                        float64
 	KeyShare_Append_RandomGroups                       float64
 	Extensions_Append_ALPS                             float64
+	Extensions_Append_TrustAnchors                     float64
+	// PQS only in Chrome dev
 }
 
 // Do not modify them directly as they may being used. If you
@@ -710,6 +716,7 @@ var DefaultWeights = Weights{
 	FirstKeyShare_Set_CurveP256:                        0.00, // legacy setting
 	KeyShare_Append_RandomGroups:                       0.50,
 	Extensions_Append_ALPS:                             0.33,
+	Extensions_Append_TrustAnchors:                     0.1,
 }
 
 // based on spec's GreaseStyle, GREASE_PLACEHOLDER may be replaced by another GREASE value

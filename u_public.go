@@ -375,6 +375,7 @@ type PubClientHelloMsg struct {
 	AlpnProtocols                []string
 
 	// 1.3
+	TrustAnchors                     bool
 	SupportedSignatureAlgorithmsCert []SignatureScheme
 	SupportedVersions                []uint16
 	Cookie                           []byte
@@ -414,6 +415,7 @@ func (chm *PubClientHelloMsg) getPrivatePtr() *clientHelloMsg {
 			alpnProtocols:                    chm.AlpnProtocols,
 			scts:                             chm.Scts,
 
+			trustAnchors:            chm.TrustAnchors,
 			supportedVersions:       chm.SupportedVersions,
 			cookie:                  chm.Cookie,
 			keyShares:               KeyShares(chm.KeyShares).ToPrivate(),
@@ -464,6 +466,7 @@ func (chm *clientHelloMsg) getPublicPtr() *PubClientHelloMsg {
 			SecureRenegotiationSupported: chm.secureRenegotiationSupported,
 			AlpnProtocols:                chm.alpnProtocols,
 
+			TrustAnchors:                     chm.trustAnchors,
 			SupportedSignatureAlgorithmsCert: chm.supportedSignatureAlgorithmsCert,
 			SupportedVersions:                chm.supportedVersions,
 			Cookie:                           chm.cookie,

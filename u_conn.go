@@ -12,10 +12,11 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
-	"golang.org/x/exp/slices"
 	"hash"
 	"net"
 	"strconv"
+
+	"golang.org/x/exp/slices"
 
 	"golang.org/x/crypto/cryptobyte"
 )

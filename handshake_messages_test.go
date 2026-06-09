@@ -203,6 +203,9 @@ func (*clientHelloMsg) Generate(rand *rand.Rand, size int) reflect.Value {
 	if rand.Intn(10) > 5 {
 		m.extendedMasterSecret = true
 	}
+	if rand.Intn(10) > 5 {
+		m.trustAnchors = true
+	}
 	for i := 0; i < rand.Intn(5); i++ {
 		m.supportedVersions = append(m.supportedVersions, uint16(rand.Intn(0xffff)+1))
 	}

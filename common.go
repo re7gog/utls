@@ -18,7 +18,6 @@ import (
 	"crypto/x509"
 	"errors"
 	"fmt"
-	"golang.org/x/exp/slices"
 	"io"
 	"net"
 	"runtime"
@@ -26,6 +25,8 @@ import (
 	"sync"
 	"time"
 	_ "unsafe" // for linkname
+
+	"golang.org/x/exp/slices"
 
 	"github.com/metacubex/utls/internal/fips140tls"
 )
@@ -128,6 +129,7 @@ const (
 	extensionSignatureAlgorithmsCert uint16 = 50
 	extensionKeyShare                uint16 = 51
 	extensionQUICTransportParameters uint16 = 57
+	extensionTrustAnchors            uint16 = 0xca34
 	extensionRenegotiationInfo       uint16 = 0xff01
 	extensionECHOuterExtensions      uint16 = 0xfd00
 	extensionEncryptedClientHello    uint16 = 0xfe0d
@@ -220,6 +222,7 @@ const (
 	signatureECDSA
 	signatureEd25519
 	signatureEdDilithium3
+	signatureMLDSA
 )
 
 // directSigning is a standard Hash value that signals that no pre-hashing
@@ -412,6 +415,7 @@ type ClientSessionCache interface {
 
 // SignatureScheme identifies a signature algorithm supported by TLS. See
 // RFC 8446, Section 4.2.3.
+// RFC 9881 for PQ
 type SignatureScheme uint16
 
 const (
@@ -432,6 +436,11 @@ const (
 
 	// EdDSA algorithms.
 	Ed25519 SignatureScheme = 0x0807
+
+	// MLDSA algorithms for PQ cryptography. TLS 1.3 only.
+	MLDSA44 SignatureScheme = 0x0904
+	MLDSA65 SignatureScheme = 0x0905
+	MLDSA87 SignatureScheme = 0x0906
 
 	// Legacy signature and hash algorithms for TLS 1.2.
 	PKCS1WithSHA1 SignatureScheme = 0x0201

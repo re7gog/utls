@@ -7,8 +7,9 @@ package tls
 import (
 	"errors"
 	"fmt"
-	"golang.org/x/exp/slices"
 	"strings"
+
+	"golang.org/x/exp/slices"
 
 	"golang.org/x/crypto/cryptobyte"
 )
@@ -88,6 +89,7 @@ type clientHelloMsg struct {
 	extendedMasterSecret             bool
 	alpnProtocols                    []string
 	scts                             bool
+	trustAnchors                     bool
 	// ems                              bool // [uTLS] actually implemented due to its prevalence // removed since crypto/tls implements it
 	supportedVersions       []uint16
 	cookie                  []byte
@@ -256,6 +258,17 @@ func (m *clientHelloMsg) marshalMsgReorderOuterExts(echInner bool, outerExts []u
 						})
 					}
 				})
+			})
+		}
+	}
+	if m.trustAnchors {
+		// RFC 9881
+		if echInner {
+			echOuterExts = append(echOuterExts, extensionTrustAnchors)
+		} else {
+			exts.AddUint16(extensionTrustAnchors)
+			exts.AddUint16LengthPrefixed(func(exts *cryptobyte.Builder) {
+				exts.AddUint16(0) // 00 00
 			})
 		}
 	}
@@ -614,6 +627,12 @@ func (m *clientHelloMsg) unmarshal(data []byte) bool {
 		case extensionSCT:
 			// RFC 6962, Section 3.3.1
 			m.scts = true
+		case extensionTrustAnchors:
+			var data uint16
+			if !extData.ReadUint16(&data) {
+				return false
+			}
+			m.trustAnchors = data == 0
 		case extensionSupportedVersions:
 			// RFC 8446, Section 4.2.1
 			var versList cryptobyte.String
@@ -733,6 +752,7 @@ func (m *clientHelloMsg) clone() *clientHelloMsg {
 		extendedMasterSecret:             m.extendedMasterSecret,
 		alpnProtocols:                    slices.Clone(m.alpnProtocols),
 		scts:                             m.scts,
+		trustAnchors:                     m.trustAnchors,
 		supportedVersions:                slices.Clone(m.supportedVersions),
 		cookie:                           slices.Clone(m.cookie),
 		keyShares:                        slices.Clone(m.keyShares),

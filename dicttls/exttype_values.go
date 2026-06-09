@@ -63,6 +63,7 @@ const (
 	ExtType_ticket_request                         uint16 = 58
 	ExtType_dnssec_chain                           uint16 = 59
 	ExtType_renegotiation_info                     uint16 = 65281
+	ExtType_trust_anchors                          uint16 = 51764
 )
 
 // Not IANA assigned
@@ -134,6 +135,7 @@ var DictExtTypeValueIndexed = map[uint16]string{
 	58:    "ticket_request",
 	59:    "dnssec_chain",
 	65281: "renegotiation_info",
+	51764: "trust_anchors",
 
 	13172: "next_protocol_negotiation",
 	17513: "application_settings",
@@ -203,6 +205,7 @@ var DictExtTypeNameIndexed = map[string]uint16{
 	"ticket_request":                         58,
 	"dnssec_chain":                           59,
 	"renegotiation_info":                     65281,
+	"trust_anchors":                          51764,
 
 	"next_protocol_negotiation": 13172,
 	"application_settings":      17513,
